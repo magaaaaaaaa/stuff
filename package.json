@@ -1,0 +1,22 @@
+{
+  "name": "cybermouse-pro",
+  "version": "2.0.0",
+  "description": "AI optical hand virtual mouse PC controller with ultra-light jitter filter",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "serve": "node serve.js"
+  },
+  "keywords": [
+    "virtual-mouse",
+    "hand-tracking",
+    "mediapipe",
+    "win32",
+    "electron"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^41.7.1"
+  }
+}
