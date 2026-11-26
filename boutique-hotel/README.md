@@ -6,22 +6,35 @@ Two-storey boutique hotel on the 40 × 60 m plot in Astana (hotel zone = souther
 
 | File | Content |
 |---|---|
-| `AUL_Boutique_Hotel.dxf` | The CAD file: all four drawings in model space + four A2 layouts with title blocks |
-| `AUL_Boutique_Hotel_all_sheets.pdf` | The four sheets in one PDF (true A2 size) |
+| `AUL_Boutique_Hotel.dxf` | The CAD file: all drawings in model space + six A2 layouts with title blocks |
+| `AUL_Boutique_Hotel_all_sheets.pdf` | The six sheets in one PDF (true A2 size) |
 | `A-01_SITE_PLAN` .pdf / .png | Site plan, 1:200 |
 | `A-02_FIRST_FLOOR` .pdf / .png | First-floor plan, 1:100 |
 | `A-03_SECOND_FLOOR` .pdf / .png | Second-floor plan, 1:100 |
+| `A-04_ELEVATIONS_N-S` .pdf / .png | North (front) and south elevations, 1:100 |
+| `A-05_ELEVATIONS_E-W_SECTION` .pdf / .png | East and west (side) elevations and section A-A, 1:100 |
 | `S-01_FOUNDATION` .pdf / .png | Foundation plan, 1:100 + strip-footing detail, 1:25 |
-| `room_schedule.md` | Room areas against the manual's limits (for the report) |
+| `AUL_Boutique_Hotel_Report.docx` / `.pdf` | The project report (all ten sections of the manual) |
+| `sketches/` | Three preliminary concept sketches used in the report |
+| `report_figures/` | The drawing crops used as figures in the report |
+| `room_schedule.md`, `rooms.json` | Room areas against the manual's limits |
 
 ## Before submitting
 
 1. Open `AUL_Boutique_Hotel.dxf` in AutoCAD and **Save As → AutoCAD Drawing (.dwg)**. The manual asks for a DWG.
-2. Replace `STUDENT NAME` and `ID ________` in the title block of each of the four layout tabs
-   (or change `STUDENT`, `STUDENT_ID`, `DATE` at the top of `build.py` and run `python3 build.py && python3 render.py`).
+2. Replace `STUDENT NAME` and `ID ________` in the title block of each of the six layout tabs
+   (or change `STUDENT`, `STUDENT_ID`, `DATE` at the top of `build.py` and run `./make_all.sh`).
 3. Look through every layout tab once. The file was generated with a script and checked by rendering it,
    but it has **not** been opened in AutoCAD itself.
-4. Still missing for the full submission: elevations, building section, preliminary sketch, the report text.
+4. In the report (`.docx`), fill in everything highlighted in yellow:
+   - student name, student ID and submission date on the title page;
+   - section 2.2 **Location**: coordinates, map screenshot and the reason for the choice (the manual requires this
+     in the designer notes; use the location submitted on 30 October);
+   - references [6]–[8]: the Kazakh code numbers and titles were written from memory — check each one and
+     delete any that were not actually consulted.
+5. The preliminary sketches in section 3 were made for this design. If different sketches were handed in on
+   30 October, replace them with those (the manual allows only minor changes between the two submissions).
+6. Read the designer notes and put them into your own words, then export the report from Word as PDF.
 
 ## The design in short
 
@@ -39,6 +52,8 @@ Two-storey boutique hotel on the 40 × 60 m plot in Astana (hotel zone = souther
 - **Every room is different.** No two rooms share size, shape, orientation and bathroom position:
   south, west, north-court and corner rooms, two L-shaped rooms, and a deluxe room with the diagonal
   glazed wall.
+- **Elevations and section.** Two-storey wings with parapet at +7.200 m, single-storey pool hall with the
+  balcony on its roof; section A-A is an offset section through the pool and stair 1.
 - **Foundation.** Continuous RC strip footings under the load-bearing walls (1200 mm under exterior,
   800 mm under interior), underside at −2.300 m, plus an RC pool basin.
 
@@ -75,5 +90,7 @@ Guest-room areas include the private bathroom.
 
 ## Files
 
-`build.py` (sheets, site, foundation) · `hotel.py` (floor-plan geometry) · `plan.py`, `cadlib.py` (helpers) ·
-`render.py` (PDF/PNG export). Requires `ezdxf`, `shapely`, `pymupdf`.
+`build.py` (sheets, site, foundation) · `hotel.py` (floor-plan geometry) · `elev.py` (elevations, section) ·
+`plan.py`, `cadlib.py` (helpers) · `render.py` (PDF/PNG export) · `sketches.py` · `report_figures.py` ·
+`make_report.js` (report) · `make_all.sh` (runs everything).
+Requires Python with `ezdxf`, `shapely`, `pymupdf`, `matplotlib`, `pillow`; Node with `docx`; LibreOffice for the report PDF.

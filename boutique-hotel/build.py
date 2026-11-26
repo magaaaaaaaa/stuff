@@ -15,6 +15,7 @@ from shapely import affinity
 from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import unary_union
 
+import elev as E
 import hotel as H
 from cadlib import Dwg, new_doc, polys
 from hotel import dl
@@ -30,6 +31,7 @@ PROJECT = 'TWO-STOREY BOUTIQUE HOTEL "AUL", ASTANA'
 
 # model-space origins of the individual drawings (mm)
 O_SITE, O_GF, O_FF, O_FND, O_DET = (0, 0), (100000, 0), (200000, 0), (300000, 0), (400000, 0)
+O_E4, O_E5 = (500000, 0), (600000, 0)   # elevations N + S; elevations E + W and section
 BLDG_ON_SITE = (3300, 3300)       # grid 1/A on the site (outer faces 3.0 m from W and S boundary)
 
 
@@ -87,6 +89,7 @@ def draw_first_floor(msp):
     d.text("staff entrance", (7100, 24750), 130, "A-TEXT")
     d.text("MAIN ENTRANCE", dl(0, 6350), 200, "A-TEXT", rot=-45, style="ARIALBD")
     d.text("step-free access via ramp", dl(0, 6050), 120, "A-TEXT", rot=-45)
+    E.section_marks(d)
     title_under(d, (-3500, -5600), "FIRST FLOOR PLAN", "1:100")
     return P
 
@@ -98,8 +101,20 @@ def draw_second_floor(msp):
     north_arrow(d, (29800, 22300), 900)
     H.level_mark(d, (23800, 6750), "+3.300  FFL")
     H.level_mark(d, (8600, 3550), "+3.250")
+    E.section_marks(d)
     title_under(d, (-3500, -5600), "SECOND FLOOR PLAN", "1:100")
     return P
+
+
+# ---------------------------------------------------------------------------
+#  ELEVATIONS AND SECTION
+# ---------------------------------------------------------------------------
+def draw_elevations(msp, P1, P2):
+    ops = [(o, 0) for o in P1.openings] + [(o, 3300) for o in P2.openings]
+    for view, (ox, oy) in (("N", (O_E4[0], O_E4[1] + 22000)), ("S", (O_E4[0], O_E4[1] + 6000)),
+                           ("W", (O_E5[0], O_E5[1] + 29200)), ("E", (O_E5[0], O_E5[1] + 17400))):
+        E.elevation(Dwg(msp, ox, oy), view, ops)
+    E.section(Dwg(msp, O_E5[0], O_E5[1] + 6000), P1, P2)
 
 
 # ---------------------------------------------------------------------------
@@ -512,7 +527,8 @@ def schedule_rows(P):
             if r["no"] == "102":
                 name += " (accessible)"
         rows.append((name, f"{r['area']:.1f}", r["spec"] if r["spec"] != "additional" else "extra"))
-    return rows
+    guests = sorted([r for r in rows if r[0][:3].isdigit()], key=lambda r: r[0])
+    return guests + [r for r in rows if not r[0][:3].isdigit()]
 
 
 def make_sheet(doc, name, title, number, scale_txt, viewports, panel):
@@ -609,6 +625,7 @@ def build():
     msp = doc.modelspace()
     P1 = draw_first_floor(msp)
     P2 = draw_second_floor(msp)
+    draw_elevations(msp, P1, P2)
     fnd = draw_foundation(msp)
     draw_foundation_detail(msp)
     gf_area = H.FOOT_GF.area / 1e6
@@ -697,6 +714,46 @@ def build():
                [(VC[0], VC[1], VW, VH, O_GF[0] + 15200, O_GF[1] + 10400, 100)], gf_panel)
     make_sheet(doc, "A-03 SECOND FLOOR", "SECOND FLOOR PLAN", "A-03", "1 : 100",
                [(VC[0], VC[1], VW, VH, O_FF[0] + 15200, O_FF[1] + 10400, 100)], ff_panel)
+    def elev_panel(d):
+        y = text_block(d, px, 402, "ELEVATION NOTES", [
+            "1. North elevation = front: it faces the arrival",
+            "    court; the 45-degree entrance facade and",
+            "    vestibule appear foreshortened.",
+            "2. South and east facades carry the large",
+            "    windows (restaurant, pool hall, guest rooms);",
+            "    the north facades have few, small openings.",
+            "3. Two-storey wings: parapet +7.200.",
+            "    Pool hall: one storey, public balcony on its",
+            "    roof at +3.300 with a 1.1 m glass balustrade.",
+            "4. Plinth up to FFL \u00b10.000 (450 above ground).",
+            "5. Entrance: 3 risers + 1:12 ramp, canopy over.",
+        ])
+        text_block(d, px, y, "FINISHES", [ln for ln in E.FINISH_NOTES[1:]], h=1.8, lead=3.3)
+
+    def sec_panel(d):
+        y = text_block(d, px, 402, "SECTION NOTES", [
+            "1. Section A-A is an offset section looking east:",
+            "    through the pool at x = 6800 and through",
+            "    stair 1 at x = 9300 (jog on grid line D side).",
+            "2. Storey height 3.30 m, clear height 3.00 m.",
+            "3. Stair 1: 2 flights x 11 risers, 150 x 300 mm,",
+            "    half landing at +1.650.",
+            "4. Floors and roof: 300 mm RC slabs on",
+            "    load-bearing masonry walls.",
+            "5. Roof: insulation laid to falls, parapet +7.200.",
+            "6. Pool basin: RC, water depth 1.20-1.60 m",
+            "    (1.40 m at the cut).",
+            "7. Footings at -2.300, below the frost depth.",
+        ])
+        text_block(d, px, y, "ELEVATIONS", [
+            "East = restaurant / terrace side.",
+            "West = pool hall and west-wing guest rooms.",
+        ])
+
+    make_sheet(doc, "A-04 ELEVATIONS N-S", "ELEVATIONS: NORTH (FRONT), SOUTH", "A-04", "1 : 100",
+               [(VC[0], VC[1], VW, VH, O_E4[0] + 15700, O_E4[1] + 16500, 100)], elev_panel)
+    make_sheet(doc, "A-05 ELEVATIONS E-W SECTION", "ELEVATIONS E, W; SECTION A-A", "A-05", "1 : 100",
+               [(VC[0], VC[1], VW, VH, O_E5[0] + 12000, O_E5[1] + 18700, 100)], sec_panel)
     make_sheet(doc, "S-01 FOUNDATION", "FOUNDATION PLAN", "S-01", "1 : 100 / 1 : 25",
                [(VC[0], VC[1], VW, VH, O_FND[0] + 15200, O_FND[1] + 10400, 100),
                 (PX0 + 69, 215, 132, 168, O_DET[0], O_DET[1] - 640, 25)], fnd_panel)
@@ -715,6 +772,10 @@ def build():
                 f.write(f"| {n} | {a} | {s} |\n")
             f.write("\n")
         f.write("Guest-room areas include the private bathroom. Public balcony: 51.3 m2.\n")
+    import json
+    with open(os.path.join(OUT, "rooms.json"), "w") as f:
+        json.dump({"footprint": round(gf_area, 1), "second": round(H.FO_2F.area / 1e6, 1),
+                   "gf": schedule_rows(P1), "ff": schedule_rows(P2)}, f, indent=1)
     print("saved", path)
     return doc
 

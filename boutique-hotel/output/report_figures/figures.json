@@ -1,0 +1,67 @@
+{
+ "site": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/site.png",
+  "w": 2829,
+  "h": 3237
+ },
+ "gf": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/gf.png",
+  "w": 3651,
+  "h": 3182
+ },
+ "ff": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/ff.png",
+  "w": 3651,
+  "h": 3182
+ },
+ "fnd": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/fnd.png",
+  "w": 3651,
+  "h": 3182
+ },
+ "fnd_detail": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/fnd_detail.png",
+  "w": 1183,
+  "h": 1564
+ },
+ "el_n": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/el_n.png",
+  "w": 3651,
+  "h": 1109
+ },
+ "el_s": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/el_s.png",
+  "w": 3651,
+  "h": 1109
+ },
+ "el_w": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/el_w.png",
+  "w": 3035,
+  "h": 1091
+ },
+ "el_e": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/el_e.png",
+  "w": 3035,
+  "h": 1072
+ },
+ "sec": {
+  "path": "/home/user/stuff/boutique-hotel/output/report_figures/sec.png",
+  "w": 3035,
+  "h": 1328
+ },
+ "sketch1_site": {
+  "path": "/home/user/stuff/boutique-hotel/output/sketches/sketch1_site.png",
+  "w": 1158,
+  "h": 1329
+ },
+ "sketch2_options": {
+  "path": "/home/user/stuff/boutique-hotel/output/sketches/sketch2_options.png",
+  "w": 1904,
+  "h": 677
+ },
+ "sketch3_bubbles": {
+  "path": "/home/user/stuff/boutique-hotel/output/sketches/sketch3_bubbles.png",
+  "w": 1978,
+  "h": 812
+ }
+}

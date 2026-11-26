@@ -13,6 +13,7 @@ class Plan:
         self.fp = footprint
         self.rooms = []          # dicts: key, no, name, poly, spec, group
         self.cuts = []
+        self.openings = []       # every door / window / opening (for elevations, section)
         self.symbols = []        # deferred door / window drawing
         self.ext = {"S": [], "N": [], "E": [], "W": []}   # opening edges per facade
         self.walls = None
@@ -74,7 +75,9 @@ class Plan:
         hw, ht = w / 2, t / 2 + 3
         pts = [(c[0] + dv[0] * a + nv[0] * b, c[1] + dv[1] * a + nv[1] * b)
                for a, b in ((-hw, -ht), (hw, -ht), (hw, ht), (-hw, ht))]
-        self.cuts.append(Polygon(pts))
+        poly = Polygon(pts)
+        self.cuts.append(poly)
+        return poly
 
     def _edges(self, side, c, ang, w):
         if side:
@@ -83,7 +86,8 @@ class Plan:
 
     def door(self, c, ang, t, into, w=813, hinge="a", leaves=1, side=None):
         """Door in a wall running at `ang` through centre point c (wall centre line)."""
-        self._cut(c, ang, w, t)
+        self.openings.append(dict(kind="door", c=c, ang=ang, w=w, t=t, leaves=leaves,
+                                  poly=self._cut(c, ang, w, t)))
         self._edges(side, c, ang, w)
         dv, nv = self._vec(ang)
         swing = 1 if ((into[0] - c[0]) * nv[0] + (into[1] - c[1]) * nv[1]) >= 0 else -1
@@ -113,7 +117,8 @@ class Plan:
         self.symbols.append(draw)
 
     def opening(self, c, ang, t, w, side=None):
-        self._cut(c, ang, w, t)
+        self.openings.append(dict(kind="opening", c=c, ang=ang, w=w, t=t,
+                                  poly=self._cut(c, ang, w, t)))
         self._edges(side, c, ang, w)
         dv, nv = self._vec(ang)
         d = self.d
@@ -126,7 +131,8 @@ class Plan:
         self.symbols.append(draw)
 
     def window(self, c, ang, w, t=600, side=None):
-        self._cut(c, ang, w, t)
+        self.openings.append(dict(kind="window", c=c, ang=ang, w=w, t=t,
+                                  poly=self._cut(c, ang, w, t)))
         self._edges(side, c, ang, w)
         dv, nv = self._vec(ang)
         d = self.d
